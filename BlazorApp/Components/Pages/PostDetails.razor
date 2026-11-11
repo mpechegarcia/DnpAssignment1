@@ -1,6 +1,7 @@
 ﻿@page "/posts/{Id:int}"
 @using ApiContracts
 @using BlazorApp.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IPostService PostService
 @inject IUserService UserService
 @inject ICommentService CommentService
@@ -26,26 +27,34 @@ else
         </div>
     }
 
-    <h5>Add Comment</h5>
+    <AuthorizeView>
+        <Authorized>
+            <h5>Add Comment</h5>
 
-    <textarea @bind="commentBody"></textarea>
+            <textarea @bind="commentBody"></textarea>
 
-    <br />
+            <br />
 
-    <button @onclick="AddCommentAsync">Add Comment</button>
+            <button @onclick="AddCommentAsync">Add Comment</button>
 
-    <p>@message</p>
+            <p>@message</p>
+        </Authorized>
+    </AuthorizeView>
 }
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
+    [CascadingParameter]
+    public Task<AuthenticationState> State { get; set; } = null!;
+
     private PostDto? post;
     private List<CommentDto> comments = new();
     private string authorName = "";
     private string commentBody = "";
     private string message = "";
+    private int userId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,6 +64,21 @@ else
         authorName = user.UserName;
 
         comments = await CommentService.GetCommentsByPostIdAsync(Id);
+
+        AuthenticationState authenticationState = await State;
+
+        if (authenticationState.User.Identity?.IsAuthenticated == true)
+        {
+            string? userIdAsString = authenticationState.User
+                .Claims
+                .SingleOrDefault(claim => claim.Type == "Id")
+                ?.Value;
+
+            if (userIdAsString != null)
+            {
+                userId = int.Parse(userIdAsString);
+            }
+        }
     }
 
     private async Task AddCommentAsync()
@@ -62,7 +86,7 @@ else
         CreateCommentDto request = new CreateCommentDto
         {
             Body = commentBody,
-            UserId = 1,
+            UserId = userId,
             PostId = Id
         };
 

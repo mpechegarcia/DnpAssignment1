@@ -1,0 +1,154 @@
+@WebAPI_HostAddress = https://localhost:7157
+
+### CREATE USER
+
+POST {{WebAPI_HostAddress}}/Users
+Content-Type: application/json
+
+{
+  "userName": "mateo",
+  "password": "1234"
+}
+
+### GET USER BY ID
+
+GET {{WebAPI_HostAddress}}/Users/2
+Accept: application/json
+
+### GET ALL USERS
+
+GET {{WebAPI_HostAddress}}/Users
+Accept: application/json
+
+### FILTER USERS BY USERNAME
+
+GET {{WebAPI_HostAddress}}/Users?username=mat
+Accept: application/json
+
+### UPDATE USER
+
+PUT {{WebAPI_HostAddress}}/Users/2
+Content-Type: application/json
+
+{
+  "userName": "mateoUpdated",
+  "password": "5678"
+}
+
+### DELETE USER - DO NOT RUN YET
+
+DELETE {{WebAPI_HostAddress}}/Users/2
+
+
+### CREATE POST
+
+POST {{WebAPI_HostAddress}}/Posts
+Content-Type: application/json
+
+{
+  "title": "My first API post",
+  "body": "This post was created through the Web API",
+  "userId": 2
+}
+
+### GET POST BY ID
+
+GET {{WebAPI_HostAddress}}/Posts/1
+Accept: application/json
+
+### GET ALL POSTS
+
+GET {{WebAPI_HostAddress}}/Posts
+Accept: application/json
+
+### FILTER POSTS BY TITLE
+
+GET {{WebAPI_HostAddress}}/Posts?title=first
+Accept: application/json
+
+### FILTER POSTS BY USER ID
+
+GET {{WebAPI_HostAddress}}/Posts?userId=2
+Accept: application/json
+
+### FILTER POSTS BY USERNAME
+
+GET {{WebAPI_HostAddress}}/Posts?username=mateo
+Accept: application/json
+
+### UPDATE POST
+
+PUT {{WebAPI_HostAddress}}/Posts/1
+Content-Type: application/json
+
+{
+  "title": "Updated post",
+  "body": "Updated body",
+  "userId": 2
+}
+
+### DELETE POST - DO NOT RUN YET
+
+DELETE {{WebAPI_HostAddress}}/Posts/1
+
+
+### CREATE COMMENT
+
+POST {{WebAPI_HostAddress}}/Comments
+Content-Type: application/json
+
+{
+  "body": "My first API comment",
+  "userId": 2,
+  "postId": 1
+}
+
+### GET COMMENT BY ID
+
+GET {{WebAPI_HostAddress}}/Comments/1
+Accept: application/json
+
+### GET ALL COMMENTS
+
+GET {{WebAPI_HostAddress}}/Comments
+Accept: application/json
+
+### FILTER COMMENTS BY USER ID
+
+GET {{WebAPI_HostAddress}}/Comments?userId=2
+Accept: application/json
+
+### FILTER COMMENTS BY USERNAME
+
+GET {{WebAPI_HostAddress}}/Comments?username=mateo
+Accept: application/json
+
+### FILTER COMMENTS BY POST ID
+
+GET {{WebAPI_HostAddress}}/Comments?postId=1
+Accept: application/json
+
+### UPDATE COMMENT
+
+PUT {{WebAPI_HostAddress}}/Comments/1
+Content-Type: application/json
+
+{
+  "body": "Updated API comment",
+  "userId": 2,
+  "postId": 1
+}
+
+### DELETE COMMENT - DO NOT RUN YET
+
+DELETE {{WebAPI_HostAddress}}/Comments/1
+
+###
+
+POST {{WebAPI_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "userName": "MateoBlazor",
+  "password": "1234"
+}
