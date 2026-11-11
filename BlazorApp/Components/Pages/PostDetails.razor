@@ -1,0 +1,76 @@
+﻿@page "/posts/{Id:int}"
+@using ApiContracts
+@using BlazorApp.Services
+@inject IPostService PostService
+@inject IUserService UserService
+@inject ICommentService CommentService
+
+<h3>Post Details</h3>
+
+@if (post == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h4>@post.Title</h4>
+    <p>@post.Body</p>
+    <p>Author: @authorName</p>
+
+    <h5>Comments</h5>
+
+    @foreach (CommentDto comment in comments)
+    {
+        <div>
+            <p>@comment.Body</p>
+        </div>
+    }
+
+    <h5>Add Comment</h5>
+
+    <textarea @bind="commentBody"></textarea>
+
+    <br />
+
+    <button @onclick="AddCommentAsync">Add Comment</button>
+
+    <p>@message</p>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private PostDto? post;
+    private List<CommentDto> comments = new();
+    private string authorName = "";
+    private string commentBody = "";
+    private string message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        post = await PostService.GetPostAsync(Id);
+
+        UserDto user = await UserService.GetUserAsync(post.UserId);
+        authorName = user.UserName;
+
+        comments = await CommentService.GetCommentsByPostIdAsync(Id);
+    }
+
+    private async Task AddCommentAsync()
+    {
+        CreateCommentDto request = new CreateCommentDto
+        {
+            Body = commentBody,
+            UserId = 1,
+            PostId = Id
+        };
+
+        await CommentService.AddCommentAsync(request);
+
+        comments = await CommentService.GetCommentsByPostIdAsync(Id);
+
+        commentBody = "";
+        message = "Comment added.";
+    }
+}
