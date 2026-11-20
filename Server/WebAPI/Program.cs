@@ -1,13 +1,15 @@
-using FileRepositories;
+using EfcRepositories;
 using RepositoryContracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddScoped<IPostRepository, PostFileRepository>();
-builder.Services.AddScoped<IUserRepository, UserFileRepository>();
-builder.Services.AddScoped<ICommentRepository, CommentFileRepository>();
+builder.Services.AddDbContext<EfcRepositories.AppContext>();
+
+builder.Services.AddScoped<IPostRepository, EfcPostRepository>();
+builder.Services.AddScoped<IUserRepository, EfcUserRepository>();
+builder.Services.AddScoped<ICommentRepository, EfcCommentRepository>();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -18,20 +20,17 @@ var app = builder.Build();
 app.MapControllers();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
+var summaries = new[] {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/weatherforecast", () =>
-    {
+app.MapGet("/weatherforecast", () => {
         var forecast = Enumerable.Range(1, 5).Select(index =>
                 new WeatherForecast
                 (
@@ -46,7 +45,6 @@ app.MapGet("/weatherforecast", () =>
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
+record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary) {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }

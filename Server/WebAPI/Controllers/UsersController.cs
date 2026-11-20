@@ -1,6 +1,7 @@
 ﻿using ApiContracts;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace WebAPI.Controllers;
@@ -24,7 +25,8 @@ public class UsersController : ControllerBase {
 
         User created = await userRepository.AddAsync(user);
 
-        UserDto dto = new UserDto {
+        UserDto dto = new UserDto
+        {
             Id = created.Id,
             UserName = created.UserName
         };
@@ -50,7 +52,7 @@ public class UsersController : ControllerBase {
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<UserDto>> GetMany(
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetMany(
         [FromQuery] string? username) {
         IQueryable<User> users = userRepository.GetMany();
 
@@ -60,10 +62,12 @@ public class UsersController : ControllerBase {
             );
         }
 
-        IEnumerable<UserDto> dtos = users.Select(user => new UserDto {
-            Id = user.Id,
-            UserName = user.UserName
-        });
+        List<UserDto> dtos = await users
+            .Select(user => new UserDto {
+                Id = user.Id,
+                UserName = user.UserName
+            })
+            .ToListAsync();
 
         return Ok(dtos);
     }

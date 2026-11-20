@@ -1,6 +1,7 @@
 ﻿using ApiContracts;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace WebAPI.Controllers;
@@ -66,7 +67,7 @@ public class PostsController : ControllerBase {
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<PostDto>> GetMany(
+    public async Task<ActionResult<IEnumerable<PostDto>>> GetMany(
         [FromQuery] string? title,
         [FromQuery] int? userId,
         [FromQuery] string? username) {
@@ -85,23 +86,25 @@ public class PostsController : ControllerBase {
         }
 
         if (!string.IsNullOrWhiteSpace(username)) {
-            List<int> userIds = userRepository
+            List<int> userIds = await userRepository
                 .GetMany()
                 .Where(user => user.UserName.Contains(username))
                 .Select(user => user.Id)
-                .ToList();
+                .ToListAsync();
 
             posts = posts.Where(
                 post => userIds.Contains(post.UserId)
             );
         }
 
-        IEnumerable<PostDto> dtos = posts.Select(post => new PostDto {
-            Id = post.Id,
-            Title = post.Title,
-            Body = post.Body,
-            UserId = post.UserId
-        });
+        List<PostDto> dtos = await posts
+            .Select(post => new PostDto {
+                Id = post.Id,
+                Title = post.Title,
+                Body = post.Body,
+                UserId = post.UserId
+            })
+            .ToListAsync();
 
         return Ok(dtos);
     }

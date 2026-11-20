@@ -1,6 +1,7 @@
 ﻿using ApiContracts;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace WebAPI.Controllers;
@@ -70,7 +71,7 @@ public class CommentsController : ControllerBase {
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<CommentDto>> GetMany(
+    public async Task<ActionResult<IEnumerable<CommentDto>>> GetMany(
         [FromQuery] int? userId,
         [FromQuery] string? username,
         [FromQuery] int? postId) {
@@ -83,11 +84,11 @@ public class CommentsController : ControllerBase {
         }
 
         if (!string.IsNullOrWhiteSpace(username)) {
-            List<int> userIds = userRepository
+            List<int> userIds = await userRepository
                 .GetMany()
                 .Where(user => user.UserName.Contains(username))
                 .Select(user => user.Id)
-                .ToList();
+                .ToListAsync();
 
             comments = comments.Where(
                 comment => userIds.Contains(comment.UserId)
@@ -100,13 +101,14 @@ public class CommentsController : ControllerBase {
             );
         }
 
-        IEnumerable<CommentDto> dtos =
-            comments.Select(comment => new CommentDto {
+        List<CommentDto> dtos = await comments
+            .Select(comment => new CommentDto {
                 Id = comment.Id,
                 Body = comment.Body,
                 UserId = comment.UserId,
                 PostId = comment.PostId
-            });
+            })
+            .ToListAsync();
 
         return Ok(dtos);
     }
